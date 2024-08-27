@@ -10,11 +10,24 @@ import (
 var romanToArabic = map[string]int{
 	"I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
 	"VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10,
+	"XX": 20, "XXX": 30, "XL": 40, "L": 50,
+	"LX": 60, "LXX": 70, "LXXX": 80, "XC": 90, "C": 100,
 }
 
 // Массив для конвертации арабских чисел в римские
-var arabicToRoman = []string{
-	"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+var arabicToRoman = []struct {
+	value  int
+	symbol string
+}{
+	{100, "C"},
+	{90, "XC"},
+	{50, "L"},
+	{40, "XL"},
+	{10, "X"},
+	{9, "IX"},
+	{5, "V"},
+	{4, "IV"},
+	{1, "I"},
 }
 
 // Функция для конвертации римского числа в арабское
@@ -26,11 +39,15 @@ func romanToInt(roman string) (int, error) {
 }
 
 // Функция для конвертации арабского числа в римское
-func intToRoman(num int) (string, error) {
-	if num > 0 && num < len(arabicToRoman) {
-		return arabicToRoman[num], nil
+func intToRoman(num int) string {
+	var result strings.Builder
+	for _, entry := range arabicToRoman {
+		for num >= entry.value {
+			result.WriteString(entry.symbol)
+			num -= entry.value
+		}
 	}
-	return "", fmt.Errorf("result out of Roman numeral range")
+	return result.String()
 }
 
 // Функция для выполнения арифметической операции
@@ -110,7 +127,7 @@ func main() {
 		if result < 1 {
 			panic("Roman numeral result less than I")
 		}
-		romanResult, _ := intToRoman(result)
+		romanResult := intToRoman(result)
 		fmt.Println("Результат:", romanResult)
 	} else {
 		fmt.Println("Результат:", result)
